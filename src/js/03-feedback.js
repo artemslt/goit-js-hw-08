@@ -9,25 +9,28 @@ const refs = {
 refs.form.addEventListener('submit', onFormSubmit);
 refs.form.addEventListener('input', throttle(formInput, 500));
 const formData = {};
-lastMessage();
+const FEEDBACK_FORM_STATE = 'feedback-form-state';
+const localStorageData = localStorage.getItem(FEEDBACK_FORM_STATE);
+setLocalStorageData();
 //
 function onFormSubmit(evt) {
   evt.preventDefault();
+  if (!refs.input.value || !refs.textarea.value) {
+    return alert('Please fill the form');
+  }
   console.log(formData);
   evt.currentTarget.reset();
-  localStorage.removeItem('feedback-form-state');
+  localStorage.removeItem(FEEDBACK_FORM_STATE);
 }
 
 function formInput(evt) {
   formData[evt.target.name] = evt.target.value;
-  localStorage.setItem('feedback-form-state', JSON.stringify(formData));
+  localStorage.setItem(FEEDBACK_FORM_STATE, JSON.stringify(formData));
 }
 
-function lastMessage() {
-  if (localStorage.getItem('feedback-form-state')) {
-    const { email, message } = JSON.parse(
-      localStorage.getItem('feedback-form-state')
-    );
+function setLocalStorageData() {
+  if (localStorageData) {
+    const { email, message } = JSON.parse(localStorageData);
     if (message) {
       formData.message = message;
       refs.textarea.value = formData.message;
